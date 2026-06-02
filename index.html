@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BALD.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HUD : logo + vies pixel art + jauge fine -->
+  <!-- Definition du symbole coeur (reutilise 3 fois) -->
+  <svg style="display:none" aria-hidden="true">
+    <symbol id="pxHeart" viewBox="0 0 5 5">
+      <rect x="0" y="0" width="2" height="1" fill="#e63946"/>
+      <rect x="3" y="0" width="2" height="1" fill="#e63946"/>
+      <rect x="0" y="1" width="5" height="2" fill="#e63946"/>
+      <rect x="1" y="3" width="3" height="1" fill="#e63946"/>
+      <rect x="2" y="4" width="1" height="1" fill="#e63946"/>
+      <rect x="1" y="1" width="1" height="1" fill="#ffd6d6"/>
+    </symbol>
+  </svg>
+
+  <header class="hud">
+    <span class="hud-logo">BALD<span class="dot">.</span></span>
+    <span class="hud-right">
+      <span class="hud-lives" aria-label="3 vies">
+        <svg class="heart"><use href="#pxHeart"/></svg>
+        <svg class="heart"><use href="#pxHeart"/></svg>
+        <svg class="heart"><use href="#pxHeart"/></svg>
+      </span>
+      <span class="hud-meter">
+        <span class="meter">
+          <span class="meter-fill" id="meter"></span>
+        </span>
+      </span>
+    </span>
+  </header>
+
+  <!-- Scène fixe -->
+  <div class="stage">
+    <div class="sky"></div>
+
+    <!-- Nuages (parallax scroll → sensation de chute) -->
+    <div class="cloud-layer" id="cloudLayer">
+      <div class="cloud" style="top: 6%;   left: 12%;"></div>
+      <div class="cloud cloud-small" style="top: 18%; left: 72%;"></div>
+      <div class="cloud" style="top: 38%;  left: 22%;"></div>
+      <div class="cloud cloud-small" style="top: 55%; left: 78%;"></div>
+      <div class="cloud" style="top: 78%;  left: 8%;"></div>
+      <div class="cloud cloud-small" style="top: 98%; left: 60%;"></div>
+      <div class="cloud" style="top: 122%; left: 18%;"></div>
+      <div class="cloud cloud-small" style="top: 142%; left: 82%;"></div>
+      <div class="cloud" style="top: 166%; left: 45%;"></div>
+      <div class="cloud cloud-small" style="top: 188%; left: 15%;"></div>
+      <div class="cloud" style="top: 212%; left: 68%;"></div>
+      <div class="cloud cloud-small" style="top: 235%; left: 30%;"></div>
+      <div class="cloud" style="top: 262%; left: 75%;"></div>
+      <div class="cloud cloud-small" style="top: 288%; left: 10%;"></div>
+      <div class="cloud" style="top: 315%; left: 50%;"></div>
+    </div>
+
+    <!-- Casquette — sprite PNG -->
+    <div class="cap" id="cap">
+      <img src="cap.png" alt="" draggable="false"/>
+    </div>
+
+    <!-- Perso — 4 sprites PNG :
+         - guy.png          : etat de base (sans cap) — pendant la chute
+         - guy-wink.png     : etat wink (sans cap) — pas utilise pour l'instant
+         - guy-cap.png      : composite final (avec cap posee) — apres l'impact
+         - guy-cap-wink.png : composite + wink — anime pendant la punchline -->
+    <div class="bald-guy" id="baldGuy">
+      <img src="guy.png"          class="guy-base"     alt="" draggable="false"/>
+      <img src="guy-wink.png"     class="guy-wink"     alt="" draggable="false"/>
+      <img src="guy-cap.png"      class="guy-cap"      alt="" draggable="false"/>
+      <img src="guy-cap-wink.png" class="guy-cap-wink" alt="" draggable="false"/>
+    </div>
+
+    <!-- Flash d'impact -->
+    <div class="impact" id="impact">
+      <div class="impact-star"></div>
+      <div class="impact-text">+1 STYLE</div>
+    </div>
+
+    <!-- Punchline finale (transparente : le perso reste visible et fait son wink) -->
+    <div class="punchline" id="punchline">
+      <div class="punchline-top">
+        <div class="punchline-title">BALD<span class="dot">.</span> ACQUIRED</div>
+        <div class="punchline-sub">YOU WIN.</div>
+      </div>
+      <div class="punchline-bottom">
+        <button class="cta" id="cta">▶ BUY THE CAP — 39€</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Track de scroll (durée de la chute) -->
+  <main class="scroll-track" aria-hidden="true">
+    <div class="track-section"></div>
+    <div class="track-section"></div>
+    <div class="track-section"></div>
+    <div class="track-section"></div>
+    <div class="track-section"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+/* ====================================================
+   BALD. — Refactor cohérent, fluide et sobre
+   Palette restreinte. Pixel art propre. Animations CSS lisses.
+   ==================================================== */
+
+:root {
+  --sky-top:    #8dd3fd;
+  --sky-mid:    #5cbcfd;
+  --sky-deep:   #3a9ed8;
+  --ink:        #111111;
+  --ink-soft:   #1a1a1a;
+  --paper:      #f8f5e9;
+  --accent:     #e63946;
+  --gold:       #ffd23f;
+  --pixel-font: 'Press Start 2P', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--sky-mid);
+  color: var(--paper);
+  font-family: var(--pixel-font);
+  overflow-x: hidden;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+}
+
+/* ============ HUD discret ============ */
+.hud {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  padding: 18px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  gap: 24px;
+  pointer-events: none;
+}
+
+.hud-logo {
+  font-size: 18px;
+  color: var(--paper);
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.hud-logo .dot { color: var(--accent); }
+
+/* Bloc droit du HUD : coeurs + jauge empiles */
+.hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+/* Vies pixel art (3 coeurs) */
+.hud-lives {
+  display: flex;
+  gap: 6px;
+  filter: drop-shadow(2px 2px 0 var(--ink));
+}
+.heart {
+  width: 22px;
+  height: 22px;
+  display: block;
+  shape-rendering: crispEdges;
+  image-rendering: pixelated;
+}
+
+.hud-meter {
+  flex: 0 0 auto;
+  width: 200px;
+}
+.meter {
+  display: block;
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.25);
+  border: 2px solid var(--paper);
+  padding: 1px;
+}
+.meter-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--paper);
+  transition: width 0.06s linear, background-color 0.3s;
+}
+
+/* ============ STAGE ============ */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+.sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-deep) 100%);
+}
+
+/* ============ NUAGES ============ */
+.cloud-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+/* Forme nuage en blocs pixel (via box-shadow) */
+.cloud {
+  position: absolute;
+  width: 24px;
+  height: 14px;
+  background: var(--paper);
+  box-shadow:
+    24px 0 0 var(--paper),
+    -24px 0 0 var(--paper),
+    48px 0 0 var(--paper),
+    -8px -14px 0 var(--paper),
+    16px -14px 0 var(--paper),
+    32px -14px 0 var(--paper);
+  opacity: 0.95;
+}
+.cloud-small {
+  width: 14px;
+  height: 10px;
+  box-shadow:
+    14px 0 0 var(--paper),
+    -14px 0 0 var(--paper),
+    14px -10px 0 var(--paper);
+  opacity: 0.9;
+}
+
+/* ============ CASQUETTE (sprite PNG, un peu reduite) ============ */
+.cap {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  width: clamp(120px, 11vw, 200px);
+  aspect-ratio: 1774 / 1246;
+  transform: translateX(-50%) rotate(0deg);
+  transform-origin: 50% 50%;
+  z-index: 10;
+  will-change: transform, top;
+  transition: opacity 0.18s ease;
+}
+.cap.hidden { opacity: 0; }
+.cap img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ============ PERSO (3 sprites superposes : base + wink + composite avec cap) ============ */
+/* NB : le crane dans les sprites IA est decale a 44% depuis la gauche
+   (pas 50%) — on compense via translateX(-44%) au lieu de -50% pour que
+   le crane se retrouve au centre du viewport (la ou la cap tombe). */
+.bald-guy {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: clamp(200px, 18vw, 340px);
+  aspect-ratio: 1368 / 1691;
+  transform: translateX(-44%);
+  z-index: 5;
+  will-change: top;
+}
+.bald-guy img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  /* Crossfade lisse entre les 3 sprites — evite tout flash entre les swaps */
+  transition: opacity 0.18s ease;
+}
+.bald-guy .guy-wink,
+.bald-guy .guy-cap,
+.bald-guy .guy-cap-wink { opacity: 0; }
+
+/* Etat "cap posee" : on cache base + wink (sans cap), on affiche composite */
+.bald-guy.has-cap .guy-base,
+.bald-guy.has-cap .guy-wink { opacity: 0; }
+.bald-guy.has-cap .guy-cap  { opacity: 1; }
+
+/* ============ IMPACT FLASH ============ */
+.impact {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 20;
+  pointer-events: none;
+  text-align: center;
+}
+.impact-star {
+  width: 240px;
+  height: 240px;
+  background: var(--gold);
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%,
+    79% 91%, 50% 70%, 21% 91%, 32% 57%,
+    2% 35%, 39% 35%
+  );
+  margin: 0 auto;
+  filter: drop-shadow(4px 4px 0 var(--ink));
+}
+.impact-text {
+  font-family: var(--pixel-font);
+  font-size: 24px;
+  color: var(--accent);
+  margin-top: -150px;
+  position: relative;
+  z-index: 2;
+  text-shadow:
+    3px 0 var(--ink), -3px 0 var(--ink),
+    0 3px var(--ink), 0 -3px var(--ink);
+}
+.impact.active {
+  animation: impactPop 0.45s steps(4) forwards;
+}
+@keyframes impactPop {
+  0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+  50%  { transform: translate(-50%, -50%) scale(1.3) rotate(15deg); }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(-8deg); opacity: 0; }
+}
+
+/* ============ PUNCHLINE (transparente, perso visible) ============ */
+.punchline {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8vh 20px 6vh;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  /* Pas de fond plein : on doit voir le perso derrière */
+}
+.punchline.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.punchline-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.punchline-title {
+  font-size: clamp(28px, 6vw, 56px);
+  color: var(--gold);
+  text-align: center;
+  text-shadow:
+    4px 0 var(--accent), -4px 0 var(--accent),
+    0 4px var(--accent), 0 -4px var(--accent),
+    6px 6px 0 var(--ink); /* ombre noire pour le contraste sur le ciel */
+  animation: blink 0.9s steps(2) infinite;
+}
+.punchline-title .dot {
+  color: var(--accent);
+  text-shadow:
+    4px 0 var(--gold), -4px 0 var(--gold),
+    0 4px var(--gold), 0 -4px var(--gold),
+    6px 6px 0 var(--ink);
+}
+.punchline-sub {
+  font-size: 14px;
+  color: var(--paper);
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.punchline-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@keyframes blink { 50% { opacity: 0.65; } }
+
+/* ============ CLIN D'ŒIL final (toggle entre guy-cap et guy-cap-wink) ============ */
+/* Quand le perso a sa cap ET qu'on est en phase punchline, on alterne en boucle
+   entre les 2 sprites composites pour faire le clin d'oeil. */
+.bald-guy.has-cap.winking .guy-cap {
+  animation: winkOpen 3.2s ease-in-out infinite;
+}
+.bald-guy.has-cap.winking .guy-cap-wink {
+  animation: winkClosed 3.2s ease-in-out infinite;
+}
+@keyframes winkOpen {
+  0%, 72%, 100% { opacity: 1; }
+  80%, 90%      { opacity: 0; }
+}
+@keyframes winkClosed {
+  0%, 72%, 100% { opacity: 0; }
+  80%, 90%      { opacity: 1; }
+}
+
+.cta {
+  font-family: var(--pixel-font);
+  font-size: 14px;
+  background: var(--accent);
+  color: var(--paper);
+  border: 4px solid var(--paper);
+  padding: 18px 28px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 6px 6px 0 var(--paper);
+  transition: transform 0.08s, box-shadow 0.08s, background-color 0.15s;
+}
+.cta:hover {
+  background: var(--gold);
+  color: var(--ink);
+}
+.cta:active {
+  transform: translate(6px, 6px);
+  box-shadow: 0 0 0 var(--paper);
+}
+
+/* ============ SCROLL TRACK invisible ============ */
+.scroll-track {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.track-section { height: 100vh; }
+
+/* ============ MOBILE (tablettes) ============ */
+@media (max-width: 768px) {
+  .hud { padding: 10px 14px; gap: 12px; }
+  .hud-logo { font-size: 13px; }
+  .hud-right { gap: 6px; }
+  .hud-lives { gap: 5px; }
+  .heart { width: 18px; height: 18px; }
+  .hud-meter { width: 110px; }
+
+  .cap { width: clamp(100px, 22vw, 180px); }
+  .bald-guy { width: clamp(180px, 42vw, 280px); }
+
+  .impact-star { width: 180px; height: 180px; }
+  .impact-text { font-size: 20px; margin-top: -120px; }
+
+  .punchline { padding: 6vh 16px 4vh; }
+  .punchline-title { font-size: clamp(22px, 7vw, 40px); }
+  .punchline-sub { font-size: 11px; }
+  .cta { font-size: 12px; padding: 14px 20px; }
+}
+
+/* ============ MOBILE (telephones) ============ */
+@media (max-width: 480px) {
+  .hud { padding: 8px 10px; gap: 8px; }
+  .hud-logo { font-size: 11px; letter-spacing: 1px; }
+  .heart { width: 14px; height: 14px; }
+  .hud-lives { gap: 3px; }
+  .hud-meter { width: 70px; }
+  .meter { height: 4px; }
+
+  .cap { width: clamp(90px, 28vw, 130px); }
+  .bald-guy { width: clamp(170px, 55vw, 220px); }
+
+  .impact-star { width: 140px; height: 140px; }
+  .impact-text { font-size: 16px; margin-top: -95px; }
+
+  .punchline { padding: 5vh 12px 3vh; }
+  .punchline-title { font-size: clamp(20px, 8vw, 32px); }
+  .cta { font-size: 11px; padding: 12px 16px; box-shadow: 4px 4px 0 var(--paper); }
+  .cta:active { transform: translate(4px, 4px); }
+}
