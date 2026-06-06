@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Aucun cheveu trouvé · BALD.</title>
+  <meta name="description" content="Cette page n'existe pas. Comme prévu." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:wght@300;400;500;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #f6f4ee;
+      --accent: #e63946;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px 24px;
+      gap: 40px;
+    }
+    .code {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(120px, 24vw, 320px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--paper);
+    }
+    .msg {
+      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+      font-size: clamp(20px, 2.6vw, 32px);
+      font-weight: 400;
+      font-style: italic;
+      max-width: 600px;
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+    .msg strong { font-weight: 700; font-style: normal; }
+    .back {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 18px 36px;
+      text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .back:hover { background: var(--accent); color: var(--paper); }
+    .logo {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+    .logo .dot { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <a href="/" class="logo">BALD<span class="dot">.</span></a>
+  <div class="wrap">
+    <p class="code">404</p>
+    <p class="msg">Aucun cheveu trouvé.<br/><strong>Comme prévu.</strong></p>
+    <a href="/" class="back">Retour à la couronne</a>
+  </div>
+</body>
+</html>
