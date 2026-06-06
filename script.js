@@ -56,7 +56,23 @@ const SPIN_FACTOR = 2.2; // ~2 tours sur tout le scroll
 
 let impactTriggered    = false;
 let punchlineTriggered = false;
-let ticking            = false;
+
+// ===== Smooth scrub =====
+// Le scroll natif peut sauter d'un coup (touche End, trackpad flick, etc.),
+// ce qui faisait passer l'animation de 0 a 100% en 1 frame — le user ratait
+// completement la chute de la casquette + l'ink-blast.
+//
+// On lerp entre `targetProgress` (scroll reel) et `displayedProgress` (ce
+// qu'on rend a l'ecran), avec une velocite plafonnee. Resultat : meme un
+// scroll instantane (End / Cmd+Down) joue l'animation en ~0.9s, l'utilisateur
+// voit toujours la sequence.
+//
+// targetProgress + displayedProgress sont exprimes par rapport au scrollTrack
+// COMPLET (0 = top, 1 = bas du scrollTrack), pour que l'ink-blast et le hero
+// fade soient lisses en meme temps que l'animation principale.
+let targetProgressFull    = 0;
+let displayedProgressFull = 0;
+const MAX_VELOCITY_PER_FRAME = 0.018; // ~0.9s pour parcourir 0 -> 1 a 60fps
 
 /**
  * Position de la casquette quand elle est posée (en %).
@@ -134,17 +150,20 @@ function updateInkBlast(scrollTop, heroEnd) {
 }
 
 function updateAnimation() {
-  const scrollTop = window.scrollY;
-  const heroEnd   = getHeroEndY();
+  const heroEnd = getHeroEndY();
+  // `virtualScrollTop` est le scroll lisse (pas le scrollY natif). Tant que le
+  // smooth scrub n'a pas rattrape le scroll utilisateur, virtualScrollTop est
+  // en retard — c'est exactement ce qu'on veut pour ne pas rater l'animation.
+  const virtualScrollTop = displayedProgressFull * heroEnd;
   // Progress de l'animation hero limite a sa zone (5/7 du scrollTrack).
   // Au-dela, l'animation est figee a 100%.
-  const animEnd   = heroEnd * ANIM_END_FRAC;
-  const progress  = clamp(scrollTop / animEnd, 0, 1);
+  const animEnd  = heroEnd * ANIM_END_FRAC;
+  const progress = clamp(virtualScrollTop / animEnd, 0, 1);
 
   // HUD + STAGE fade quand on entre dans la zone ink.
   // Indispensable : sans le fade de la stage, on la verrait reapparaitre
   // derriere l'ink-blast quand celui-ci s'efface pour reveler le premium.
-  if (scrollTop > heroEnd * INK_START_FRAC) {
+  if (virtualScrollTop > heroEnd * INK_START_FRAC) {
     hudEl.classList.add('hero-fade');
     stageEl.classList.add('hero-fade');
   } else {
@@ -152,7 +171,7 @@ function updateAnimation() {
     stageEl.classList.remove('hero-fade');
   }
 
-  updateInkBlast(scrollTop, heroEnd);
+  updateInkBlast(virtualScrollTop, heroEnd);
 
   // ============ JAUGE ============
   meterFill.style.width = (progress * 100) + '%';
@@ -254,19 +273,59 @@ function updateAnimation() {
   }
 }
 
-// rAF pour lisser les events de scroll
-function onScroll() {
-  if (!ticking) {
-    requestAnimationFrame(() => {
-      updateAnimation();
-      ticking = false;
-    });
-    ticking = true;
+// ===== Boucle rAF persistante avec smooth scrub =====
+// Plutot que d'appeler updateAnimation a chaque event scroll, on tick en
+// permanence. A chaque frame :
+//   1) on recalcule targetProgressFull depuis scrollY reel
+//   2) on rapproche displayedProgressFull de target avec velocite plafonnee
+//   3) on rend l'animation avec displayedProgressFull
+//
+// Optim : on stoppe le tick quand on est endormi (hors zone hero ET diff
+// negligeable) — on reveille via les events scroll/resize.
+let rafId = null;
+let lastHeroEnd = 0;
+
+function recomputeTarget() {
+  lastHeroEnd = getHeroEndY();
+  targetProgressFull = lastHeroEnd > 0
+    ? clamp(window.scrollY / lastHeroEnd, 0, 1)
+    : 0;
+}
+
+function tickFrame() {
+  rafId = null;
+  recomputeTarget();
+
+  const diff = targetProgressFull - displayedProgressFull;
+  const absDiff = Math.abs(diff);
+  if (absDiff > 0.0005) {
+    const step = Math.sign(diff) * Math.min(absDiff, MAX_VELOCITY_PER_FRAME);
+    displayedProgressFull = clamp(displayedProgressFull + step, 0, 1);
+  } else {
+    displayedProgressFull = targetProgressFull;
+  }
+
+  updateAnimation();
+
+  // Continue de ticker tant qu'on n'a pas converge OU qu'on est dans la
+  // zone hero (au cas ou le user scrolle a nouveau).
+  const stillScrubbing = Math.abs(targetProgressFull - displayedProgressFull) > 0.0005;
+  const inHeroZone     = window.scrollY < lastHeroEnd;
+  if (stillScrubbing || inHeroZone) {
+    rafId = requestAnimationFrame(tickFrame);
   }
 }
 
-window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', updateAnimation);
+function wakeTick() {
+  if (rafId === null) rafId = requestAnimationFrame(tickFrame);
+}
 
-// Premier render
+window.addEventListener('scroll', wakeTick, { passive: true });
+window.addEventListener('resize', wakeTick);
+
+// Init : on snap displayed sur target pour ne pas rejouer une anim de
+// chargement bizarre quand on reload a mi-page.
+recomputeTarget();
+displayedProgressFull = targetProgressFull;
 updateAnimation();
+wakeTick();
