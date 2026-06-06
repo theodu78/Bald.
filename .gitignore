@@ -3,6 +3,25 @@
 .AppleDouble
 .LSOverride
 
+# Captures d'ecran (jamais commit)
+Capture d*.png
+Capture d*.jpg
+Capture *.png
+Screenshot*.png
+
+# Sources originales des images IA (lourdes, on garde uniquement les versions traitees)
+Costar.png
+Escalade.png
+Skate.png
+lecture livre terrasse.png
+5panel.png
+Baseball.png
+Snapback.png
+Gemini_Generated_Image_*.png
+
+# Images produit non utilisees (on charge depuis Shopify CDN au runtime)
+product-*.png
+
 # Python
 __pycache__/
 *.pyc

@@ -22,14 +22,28 @@ const cloudLayer = document.getElementById('cloudLayer');
 const meterFill  = document.getElementById('meter');
 const impact     = document.getElementById('impact');
 const punchline  = document.getElementById('punchline');
-const cta        = document.getElementById('cta');
 
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
 // ===== Reperes de positions =====
 const CAP_TOP_INIT_PCT  = 10;  // %  (la casquette est haute pendant la chute)
-const GUY_TOP_FINAL_PCT = 62;  // %  (perso ancre vers le bas, son t-shirt deborde)
 const GUY_TOP_INIT_PCT  = 96;  // %  (juste le sommet du crane visible en bas)
+
+// Fraction du perso qui doit etre VISIBLE dans le viewport en etat final.
+// On garde 5% du bas du t-shirt hors viewport pour cacher la ligne de coupe
+// quelle que soit la taille d'ecran (PC ou mobile).
+const GUY_VISIBLE_FRAC = 0.95;
+
+/**
+ * Position finale du perso (top%) calculee dynamiquement pour que ~5% du bas
+ * du sprite deborde sous le viewport — indep. de la resolution.
+ */
+function getGuyTopFinalPct() {
+  const guyH = baldGuy.offsetHeight;
+  const vh   = window.innerHeight;
+  const visiblePct = (GUY_VISIBLE_FRAC * guyH / vh) * 100;
+  return Math.max(0, 100 - visiblePct);
+}
 
 // ===== Bornes de phases =====
 const P_GUY_IN      = 0.55;
@@ -50,9 +64,12 @@ let ticking            = false;
  * Comme le SVG perso est cadré (haut du div = sommet du crâne),
  * il suffit de retirer la hauteur de la casquette à la position de l'humain.
  */
-// Position du sourcil dans le sprite PNG du perso, en fraction de la hauteur.
-// Augmenter cette valeur = la cap descend plus bas sur la tete.
-const SPRITE_BROW_RATIO = 0.32;
+// Position du BAS DE CAP cible dans le sprite, en fraction de la hauteur.
+// Mesure precise (luminance) : la cap dans guy-cap.png arrive a ~22% du
+// sprite. On utilise la meme valeur pour que cap.png tombante atterrisse
+// pile a la meme position que la cap dans le composite — pas de saut visible
+// au moment de la bascule.
+const SPRITE_BROW_RATIO = 0.22;
 
 function getCapLandedPct() {
   const capH = cap.offsetHeight;
@@ -61,7 +78,7 @@ function getCapLandedPct() {
   const capHeightPct = (capH / vh) * 100;
   const guyHeightPct = (guyH / vh) * 100;
   const browOffsetPct = SPRITE_BROW_RATIO * guyHeightPct;
-  return GUY_TOP_FINAL_PCT + browOffsetPct - capHeightPct;
+  return getGuyTopFinalPct() + browOffsetPct - capHeightPct;
 }
 
 // Easing helpers
@@ -69,10 +86,73 @@ const easeInQuad   = t => t * t;
 const easeOutQuad  = t => 1 - (1 - t) * (1 - t);
 const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
+// Refs pour gerer la transition vers le monde premium
+const stageEl       = document.querySelector('.stage');
+const hudEl         = document.querySelector('.hud');
+const inkBlastEl    = document.getElementById('inkBlast');
+const scrollTrackEl = document.querySelector('.scroll-track');
+
+// Le scroll-track contient 7 sections :
+//   - 5 sections (71.4%) : animation hero (chute, impact, punchline)
+//   - 2 sections (28.6%) : buffer transition ink-blast
+// L'animation se fige a 71.4%, puis l'ink-blast croit, puis tampon noir.
+const ANIM_END_FRAC  = 5 / 7;     // 71.4% : fin animation hero
+const INK_START_FRAC = 5.3 / 7;   // ~76% : l'ink demarre un peu apres la fin de l'anim
+const INK_END_FRAC   = 6.7 / 7;   // ~96% : l'ink couvre tout l'ecran
+// Au-dela d'INK_END_FRAC et jusqu'a la fin du scroll-track : ECRAN TOUT NOIR.
+// On garde l'ink a opacity 1 + radius 150% pour ne PAS revoir la stage hero.
+// L'ink ne fade que quand on entre dans le premium-world (sous le scroll-track).
+
+function getHeroEndY() {
+  return scrollTrackEl.offsetTop + scrollTrackEl.offsetHeight - window.innerHeight;
+}
+
+// Rayon (en vmax) qui couvre largement tout l'ecran depuis le centre 56%.
+const INK_MAX_VMAX = 90;
+
+function updateInkBlast(scrollTop, heroEnd) {
+  inkBlastEl.style.setProperty('--ink-x', '50%');
+  inkBlastEl.style.setProperty('--ink-y', '56%');
+
+  const inkStart = heroEnd * INK_START_FRAC;
+  const inkEnd   = heroEnd * INK_END_FRAC;
+
+  if (scrollTop < inkStart || scrollTop >= heroEnd) {
+    // HORS de la zone de transition : on cache completement l'inkblast.
+    // display:none = pas de risque de rectangle noir parasite.
+    inkBlastEl.style.display = 'none';
+  } else if (scrollTop < inkEnd) {
+    // L'ink grandit progressivement depuis le centre
+    inkBlastEl.style.display = 'block';
+    const t = (scrollTop - inkStart) / (inkEnd - inkStart);
+    inkBlastEl.style.setProperty('--ink-pct', (t * INK_MAX_VMAX).toString());
+  } else {
+    // Zone tampon (inkEnd <= scroll < heroEnd) : ECRAN TOUT NOIR
+    inkBlastEl.style.display = 'block';
+    inkBlastEl.style.setProperty('--ink-pct', INK_MAX_VMAX.toString());
+  }
+}
+
 function updateAnimation() {
   const scrollTop = window.scrollY;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progress  = clamp(scrollTop / docHeight, 0, 1);
+  const heroEnd   = getHeroEndY();
+  // Progress de l'animation hero limite a sa zone (5/7 du scrollTrack).
+  // Au-dela, l'animation est figee a 100%.
+  const animEnd   = heroEnd * ANIM_END_FRAC;
+  const progress  = clamp(scrollTop / animEnd, 0, 1);
+
+  // HUD + STAGE fade quand on entre dans la zone ink.
+  // Indispensable : sans le fade de la stage, on la verrait reapparaitre
+  // derriere l'ink-blast quand celui-ci s'efface pour reveler le premium.
+  if (scrollTop > heroEnd * INK_START_FRAC) {
+    hudEl.classList.add('hero-fade');
+    stageEl.classList.add('hero-fade');
+  } else {
+    hudEl.classList.remove('hero-fade');
+    stageEl.classList.remove('hero-fade');
+  }
+
+  updateInkBlast(scrollTop, heroEnd);
 
   // ============ JAUGE ============
   meterFill.style.width = (progress * 100) + '%';
@@ -102,10 +182,11 @@ function updateAnimation() {
   // ============ POSITIONS ============
   const capLandedPct = getCapLandedPct();
 
+  const guyTopFinalPct = getGuyTopFinalPct();
   let capTopPct = CAP_TOP_INIT_PCT;
   let guyTopPct = GUY_TOP_INIT_PCT;
 
-  // Phase 1 : casquette en haut, perso hors écran
+  // Phase 1 : casquette en haut, perso hors écran (juste sommet du crane visible)
   if (progress < P_GUY_IN) {
     capTopPct = CAP_TOP_INIT_PCT;
     guyTopPct = GUY_TOP_INIT_PCT;
@@ -114,7 +195,7 @@ function updateAnimation() {
   else if (progress < P_GUY_DONE) {
     const t = (progress - P_GUY_IN) / (P_GUY_DONE - P_GUY_IN);
     const eased = easeOutCubic(t);
-    guyTopPct = GUY_TOP_INIT_PCT + (GUY_TOP_FINAL_PCT - GUY_TOP_INIT_PCT) * eased;
+    guyTopPct = GUY_TOP_INIT_PCT + (guyTopFinalPct - GUY_TOP_INIT_PCT) * eased;
     capTopPct = CAP_TOP_INIT_PCT;
   }
   // Phase 3 : la casquette descend sur le crâne
@@ -122,12 +203,12 @@ function updateAnimation() {
     const t = (progress - P_GUY_DONE) / (P_LANDING_END - P_GUY_DONE);
     const eased = easeInQuad(t);
     capTopPct = CAP_TOP_INIT_PCT + (capLandedPct - CAP_TOP_INIT_PCT) * eased;
-    guyTopPct = GUY_TOP_FINAL_PCT;
+    guyTopPct = guyTopFinalPct;
   }
   // Phases 4 & 5 : tout fixe
   else {
     capTopPct = capLandedPct;
-    guyTopPct = GUY_TOP_FINAL_PCT;
+    guyTopPct = guyTopFinalPct;
   }
 
   cap.style.top       = capTopPct + '%';
@@ -186,10 +267,6 @@ function onScroll() {
 
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', updateAnimation);
-
-cta.addEventListener('click', () => {
-  alert('▶ Connexion Shopify Storefront API à brancher ici.\n\nProchaine étape : Buy Button ou checkout headless.');
-});
 
 // Premier render
 updateAnimation();

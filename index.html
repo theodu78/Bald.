@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -93,13 +97,19 @@
         <div class="punchline-sub">YOU WIN.</div>
       </div>
       <div class="punchline-bottom">
-        <button class="cta" id="cta">▶ BUY THE CAP — 39€</button>
+        <span class="scroll-hint" aria-hidden="true">▼ SCROLL ▼</span>
       </div>
     </div>
   </div>
 
-  <!-- Track de scroll (durée de la chute) -->
+  <!-- Track de scroll :
+       - 5 premieres sections = duree de l'animation hero (chute + impact + punchline)
+       - 2 sections suivantes = buffer pour la transition ink-blast
+       L'animation hero se fige a la fin de la 5eme section, puis l'ink-blast
+       grandit tranquillement sur 2 ecrans de scroll. -->
   <main class="scroll-track" aria-hidden="true">
+    <div class="track-section"></div>
+    <div class="track-section"></div>
     <div class="track-section"></div>
     <div class="track-section"></div>
     <div class="track-section"></div>
@@ -107,6 +117,153 @@
     <div class="track-section"></div>
   </main>
 
+  <!-- ================================================================
+       MONDE PREMIUM — post-glitch
+       ================================================================ -->
+
+  <!-- Inkblast : un cercle noir qui jaillit de la position de la cap
+       et se propage progressivement avec le scroll, jusqu'a couvrir tout. -->
+  <div class="ink-blast" id="inkBlast" aria-hidden="true"></div>
+
+  <main class="premium-world">
+
+    <section class="banner-hero">
+      <h1 class="banner-title">Yes We Bald<span class="dot">.</span></h1>
+      <p class="banner-sub">Oui nous chauvons<sup class="asterisk">*</sup></p>
+    </section>
+
+    <section class="manifeste">
+      <div class="manifeste-inner">
+        <p class="manifeste-line"><span class="hl">Il fut un temps où l'on nous a moqués. Souillés. Persécutés.</span></p>
+        <p class="manifeste-line"><span class="hl">Il fut un temps où la société servait à nous cacher.</span></p>
+        <p class="manifeste-bang"><span class="hl">Plus maintenant.</span></p>
+        <p class="manifeste-end">
+          <span class="hl">Frères et sœurs, chauvons ensemble.</span><br/>
+          <span class="hl">Unis dans l'adversité, fiers dans la lumière.</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="lifestyle">
+      <div class="lifestyle-block">
+        <div class="lifestyle-img" data-label="ESCALADE"
+             style="background-image: url('lifestyle-escalade.png');"></div>
+        <p class="lifestyle-caption">Promis, aucun cheveu ne s'envole au sommet.</p>
+      </div>
+      <div class="lifestyle-block">
+        <div class="lifestyle-img" data-label="SKATE"
+             style="background-image: url('lifestyle-skate.png');"></div>
+        <p class="lifestyle-caption">Free your head. Then your wheels.</p>
+      </div>
+      <div class="lifestyle-block">
+        <div class="lifestyle-img" data-label="LECTURE"
+             style="background-image: url('lifestyle-lecture.png');"></div>
+        <p class="lifestyle-caption">Le soleil reconnaît les siens.</p>
+      </div>
+      <div class="lifestyle-block">
+        <div class="lifestyle-img" data-label="COSTAR"
+             style="background-image: url('lifestyle-costar.png');"></div>
+        <p class="lifestyle-caption">La classe commence là où s'arrête le cheveu.</p>
+      </div>
+    </section>
+
+    <!-- =========== GRILLE DE PRODUITS (a la fin, peuplee dynamiquement) =========== -->
+    <section class="products" id="productsGrid">
+      <p class="products-loading">Chargement…</p>
+    </section>
+
+    <!-- Zone detail produit : se peuple au click sur une image de la grille -->
+    <section class="product-detail" id="productDetail" hidden>
+      <div class="product-detail-inner">
+        <button class="product-detail-close" id="productDetailClose" aria-label="Fermer">×</button>
+        <div class="product-detail-content"></div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER e-commerce ============ -->
+    <footer class="footer">
+      <div class="footer-inner">
+
+        <div class="footer-col footer-brand">
+          <p class="footer-logo">BALD<span class="dot">.</span></p>
+          <p class="footer-tagline">Yes We Bald.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-h">Livraison &amp; retours</h4>
+          <ul>
+            <li>Livraison gratuite dès 50 €</li>
+            <li>Expédition 5-7 jours ouvrés</li>
+            <li>Retours acceptés sous 14 jours</li>
+            <li>Imprimé à la demande en Europe</li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-h">Paiement sécurisé</h4>
+          <ul>
+            <li>Stripe, Visa, Mastercard</li>
+            <li>Apple Pay &amp; Google Pay</li>
+            <li>Données chiffrées via Shopify</li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-h">Une question ?</h4>
+          <ul>
+            <li><a href="mailto:hello@bald.shop">hello@bald.shop</a></li>
+            <li>Du lundi au vendredi, 9h-18h</li>
+            <li><a href="#">CGV</a> · <a href="#">Mentions légales</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <span>© <span id="footerYear"></span> BALD<span class="dot">.</span> — Tous droits réservés</span>
+        <span class="footer-made">Made with ❤︎ and zero hair</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <button class="cart-fab" id="cartFab" aria-label="Ouvrir le panier" hidden>
+    <span id="cartFabCount">0</span>
+  </button>
+  <div class="cart-backdrop" id="cartBackdrop" hidden></div>
+  <aside class="cart-panel" id="cartPanel" aria-hidden="true">
+    <header class="cart-head">
+      <h3>Votre panier</h3>
+      <button class="cart-close" id="cartClose" aria-label="Fermer">×</button>
+    </header>
+    <ul class="cart-lines" id="cartLines"></ul>
+
+    <!-- Don a la cause des chauves-souris : ironie marque pure. -->
+    <div class="cart-donation">
+      <label class="cart-donation-label">
+        <input type="checkbox" id="cartDonation"/>
+        <span class="cart-donation-box"></span>
+        <span class="cart-donation-text">
+          <span class="cart-donation-title">🦇 Reverser 1 € à l'association pour la défense des chauves-souris</span>
+        </span>
+      </label>
+    </div>
+
+    <footer class="cart-foot">
+      <div class="cart-total-line" id="cartDonationLine" hidden>
+        <span>Don aux chauves-souris</span>
+        <span>1,00 €</span>
+      </div>
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">0,00 €</span>
+      </div>
+      <button class="cart-checkout" id="cartCheckout" disabled>Passer au paiement</button>
+      <p class="cart-secure">Paiement sécurisé via Shopify</p>
+    </footer>
+  </aside>
+
+  <script src="shopify.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

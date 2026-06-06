@@ -24,6 +24,10 @@ JOBS = [
     ("Gemini_Generated_Image_m53sgbm53sgbm53s.png", "guy-wink.png",     0),
     ("Gemini_Generated_Image_ujb0mlujb0mlujb0.png", "guy-cap.png",      0),
     ("Gemini_Generated_Image_hakgh5hakgh5hakg.png", "guy-cap-wink.png", 0),
+    # Photos produit : on n'applique PAS le remove_bg (les caps blanches
+    # sont mangees par le flood-fill). A la place, on garde le fond blanc
+    # des originales et on utilise mix-blend-mode:multiply en CSS pour
+    # rendre le blanc transparent visuellement sur fond paper.
 ]
 
 base = Path("/Users/th30/Documents/Projets/DEV/Bald.")
