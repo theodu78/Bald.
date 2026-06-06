@@ -72,7 +72,7 @@ let punchlineTriggered = false;
 // fade soient lisses en meme temps que l'animation principale.
 let targetProgressFull    = 0;
 let displayedProgressFull = 0;
-const MAX_VELOCITY_PER_FRAME = 0.018; // ~0.9s pour parcourir 0 -> 1 a 60fps
+const MAX_VELOCITY_PER_FRAME = 0.008; // ~2.1s pour parcourir 0 -> 1 a 60fps
 
 /**
  * Position de la casquette quand elle est posée (en %).
