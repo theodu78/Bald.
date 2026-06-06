@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Politiques · BALD.</title>
+  <meta name="description" content="Politiques officielles de BALD. — CGV, confidentialité, retours, livraison, mentions légales." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:wght@300;400;500;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #f6f4ee;
+      --paper-deep: #ebe7da;
+      --accent: #e63946;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .logo {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--ink);
+      z-index: 10;
+    }
+    .logo .dot { color: var(--accent); }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 128px 24px 96px;
+    }
+    .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-bottom: 24px;
+    }
+    .title {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(40px, 7vw, 76px);
+      line-height: 0.98;
+      letter-spacing: 0.005em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+    .body {
+      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    .body h1, .body h2, .body h3 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 40px 0 14px;
+    }
+    .body h1 { font-size: 26px; }
+    .body h2 { font-size: 20px; }
+    .body h3 { font-size: 17px; }
+    .body p { margin-bottom: 14px; }
+    .body ul, .body ol { margin: 14px 0 14px 24px; }
+    .body li { margin-bottom: 6px; }
+    .body a {
+      color: var(--ink);
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+    }
+    .body a:hover { color: var(--accent); }
+    .body strong { font-weight: 700; }
+    .body hr {
+      border: 0;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      margin: 32px 0;
+    }
+    .body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+    }
+    .body th, .body td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      text-align: left;
+    }
+    .loading {
+      opacity: 0.4;
+      font-style: italic;
+    }
+    .updated {
+      margin-top: 40px;
+      font-size: 12px;
+      opacity: 0.45;
+      font-style: italic;
+    }
+    .policy-nav {
+      margin-top: 72px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      font-size: 12px;
+    }
+    .policy-nav a {
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.55;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .policy-nav a:hover { opacity: 1; }
+    .policy-nav a.active { opacity: 1; color: var(--accent); }
+    .back {
+      display: inline-block;
+      margin-top: 56px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 16px 32px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .back:hover { background: #2a2a2a; }
+  </style>
+</head>
+<body>
+  <a href="/" class="logo">BALD<span class="dot">.</span></a>
+  <main class="wrap">
+    <p class="eyebrow" id="policyEyebrow">Politique</p>
+    <h1 class="title" id="policyTitle">Chargement…</h1>
+    <div class="body" id="policyBody"><p class="loading">Chargement de la politique…</p></div>
+
+    <nav class="policy-nav" aria-label="Autres politiques">
+      <a href="policy.html?p=terms"    data-p="terms">CGV</a>
+      <a href="policy.html?p=privacy"  data-p="privacy">Confidentialité</a>
+      <a href="policy.html?p=refund"   data-p="refund">Retours</a>
+      <a href="policy.html?p=shipping" data-p="shipping">Livraison</a>
+      <a href="policy.html?p=legal"    data-p="legal">Mentions légales</a>
+    </nav>
+
+    <a href="/" class="back">Retour à la boutique</a>
+  </main>
+
+  <script>
+    /* ====================================================================
+       BALD. — Page politiques
+       Charge dynamiquement le contenu depuis la Storefront API Shopify
+       (4 politiques standards) + mention legale francaise en dur (non
+       exposee par l'API Shopify pour le moment).
+       ==================================================================== */
+
+    const SHOPIFY = {
+      domain:  'qwq2i9-sn.myshopify.com',
+      token:   'c5d78f20e6c190125cc80de071aec32f',
+      version: '2024-10',
+    };
+
+    const POLICIES = {
+      terms:    { field: 'termsOfService', title: 'Conditions générales de vente', eyebrow: 'CGV' },
+      privacy:  { field: 'privacyPolicy',  title: 'Politique de confidentialité',  eyebrow: 'Confidentialité' },
+      refund:   { field: 'refundPolicy',   title: 'Politique de remboursement',    eyebrow: 'Retours' },
+      shipping: { field: 'shippingPolicy', title: 'Politique d\'expédition',       eyebrow: 'Livraison' },
+      legal:    { field: null,             title: 'Mentions légales',              eyebrow: 'Mention légale' },
+    };
+
+    function urlParam(k) {
+      return new URLSearchParams(location.search).get(k);
+    }
+
+    async function gql(query) {
+      const url = `https://${SHOPIFY.domain}/api/${SHOPIFY.version}/graphql.json`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': SHOPIFY.token,
+        },
+        body: JSON.stringify({ query }),
+      });
+      const json = await res.json();
+      if (json.errors) throw new Error(json.errors[0]?.message || 'API error');
+      return json.data;
+    }
+
+    async function fetchShopifyPolicy(field) {
+      const data = await gql(`{
+        shop {
+          ${field} { title body url }
+        }
+      }`);
+      return data?.shop?.[field] || null;
+    }
+
+    function setMeta(title, eyebrow) {
+      document.title = `${title} · BALD.`;
+      document.getElementById('policyEyebrow').textContent = eyebrow;
+      document.getElementById('policyTitle').textContent = title;
+    }
+
+    function renderBody(html) {
+      document.getElementById('policyBody').innerHTML = html;
+    }
+
+    function markActive(p) {
+      document.querySelectorAll('.policy-nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.p === p);
+      });
+    }
+
+    async function loadPolicy() {
+      const p = urlParam('p') || 'terms';
+      const cfg = POLICIES[p];
+      if (!cfg) {
+        setMeta('Politique introuvable', 'Erreur');
+        renderBody('<p>Cette page n\'existe pas. <a href="/">Retour à la boutique</a>.</p>');
+        return;
+      }
+      setMeta(cfg.title, cfg.eyebrow);
+      markActive(p);
+
+      // Mention legale : contenu en dur (l'API Storefront n'expose pas
+      // ce champ specifique au marche francais a ce jour)
+      if (p === 'legal') {
+        renderBody(LEGAL_NOTICE_HTML);
+        return;
+      }
+
+      try {
+        const policy = await fetchShopifyPolicy(cfg.field);
+        if (!policy || !policy.body) {
+          renderBody('<p>Cette politique n\'a pas encore été rédigée. Revenez bientôt.</p>');
+          return;
+        }
+        renderBody(policy.body);
+      } catch (e) {
+        console.error('[BALD policy] fetch failed:', e);
+        renderBody('<p>Impossible de charger cette politique pour le moment. Réessayez plus tard ou contactez <a href="mailto:hello@bald.store">hello@bald.store</a>.</p>');
+      }
+    }
+
+    const LEGAL_NOTICE_HTML = `
+      <p>Conformément aux dispositions des articles 6-III et 19 de la Loi n° 2004-575 du 21 juin 2004 pour la Confiance dans l'Économie Numérique (LCEN), les présentes mentions légales sont portées à la connaissance des visiteurs du site <strong>BALD.</strong></p>
+
+      <h2>1. Éditeur du site</h2>
+      <p>
+        <strong>Nom commercial :</strong> BALD.<br/>
+        <strong>Forme juridique :</strong> Entreprise individuelle (micro-entreprise)<br/>
+        <strong>Représentant légal :</strong> Théo Marc André Marie Dupont<br/>
+        <strong>Adresse du siège :</strong> 10 rue Denuzière, 69002 Lyon, France<br/>
+        <strong>SIREN :</strong> 105 953 525<br/>
+        <strong>SIRET :</strong> 105 953 525 00018<br/>
+        <strong>Code APE/NAF :</strong> 47.91B — Vente à distance sur catalogue spécialisé<br/>
+        <strong>RCS :</strong> Lyon, n° 105 953 525<br/>
+        <strong>TVA intracommunautaire :</strong> Non applicable — franchise en base de TVA (art. 293 B du CGI)<br/>
+        <strong>Email :</strong> <a href="mailto:hello@bald.store">hello@bald.store</a>
+      </p>
+      <p><strong>Directeur de la publication :</strong> Théo Dupont, en qualité d'entrepreneur individuel.</p>
+
+      <h2>2. Hébergement</h2>
+      <p>
+        <strong>Site web (front) :</strong> Vercel Inc.<br/>
+        440 N Barranca Avenue #4133, Covina, CA 91723, USA<br/>
+        <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>
+      </p>
+      <p>
+        <strong>Boutique en ligne et traitement des commandes :</strong> Shopify International Limited<br/>
+        Victoria Buildings, 1-2 Haddington Road, Dublin 4, D04 XN32, Irlande<br/>
+        <a href="https://shopify.com" target="_blank" rel="noopener">shopify.com</a>
+      </p>
+
+      <h2>3. Propriété intellectuelle</h2>
+      <p>L'ensemble des éléments figurant sur le site BALD. — textes, illustrations, photographies, logos, marque "BALD.", typographies, animations, code source — est protégé par le droit d'auteur, le droit des marques et le droit des bases de données.</p>
+      <p>Toute reproduction, représentation, modification, publication, transmission ou exploitation totale ou partielle des contenus du site, par quelque procédé que ce soit, sans l'autorisation expresse et préalable de l'éditeur, est strictement interdite et constituerait une contrefaçon sanctionnée par les articles L.335-2 et suivants du Code de la propriété intellectuelle.</p>
+
+      <h2>4. Données personnelles et cookies</h2>
+      <p>Le traitement des données personnelles des utilisateurs est encadré par notre <a href="policy.html?p=privacy">Politique de confidentialité</a>, conformément au Règlement (UE) 2016/679 (RGPD) et à la Loi Informatique et Libertés du 6 janvier 1978 modifiée.</p>
+      <p>Conformément à la réglementation, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, de portabilité et d'opposition relatif à vos données personnelles. Vous pouvez exercer ces droits en adressant votre demande à <a href="mailto:hello@bald.store">hello@bald.store</a>.</p>
+      <p>En cas de réclamation, vous pouvez saisir la CNIL — Commission Nationale de l'Informatique et des Libertés (3 place de Fontenoy, 75007 Paris, <a href="https://cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</p>
+
+      <h2>5. Médiation de la consommation</h2>
+      <p>Conformément aux articles L.611-1 et suivants du Code de la consommation, en cas de litige avec BALD. non résolu par une réclamation amiable, le consommateur peut recourir gratuitement à un médiateur de la consommation.</p>
+      <p>Le consommateur dispose également de la plateforme européenne de Règlement en Ligne des Litiges (ODR) accessible à l'adresse : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
+
+      <h2>6. Droit applicable</h2>
+      <p>Les présentes mentions légales sont régies par le droit français. En cas de litige et à défaut de résolution amiable, les tribunaux français seront seuls compétents.</p>
+
+      <p class="updated">Dernière mise à jour : juin 2026.</p>
+    `;
+
+    loadPolicy();
+  </script>
+</body>
+</html>
