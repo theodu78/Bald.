@@ -72,22 +72,7 @@ let punchlineTriggered = false;
 // fade soient lisses en meme temps que l'animation principale.
 let targetProgressFull    = 0;
 let displayedProgressFull = 0;
-
-// Velocites par phase de l'animation hero (en `progressFull` par frame).
-// Le scrub utilise une velocite variable selon la phase d'anim courante :
-// plus c'est petit, plus l'utilisateur est CONTRAINT de voir cette phase
-// jouer, meme s'il a scrolle d'un coup en bas de page.
-//
-// Durees minimales garanties (a 60fps, peu importe la vitesse scroll) :
-//   - cap qui tourne en l'air (0 -> 0.55)       : ~0.45s (VEL_NORMAL)
-//   - perso qui monte (0.55 -> 0.70)            : ~0.50s (VEL_BUILDUP)
-//   - cap qui tombe sur le crane (0.70 -> 0.90) : ~2.2s  (VEL_LANDING) <- LA finalite
-//   - impact + punchline (0.90 -> 1.00)         : ~0.7s  (VEL_NORMAL)
-//   - ink-blast (au-dela)                       : ~1.0s  (VEL_INK)
-const VEL_NORMAL  = 0.012;  // regime de croisiere
-const VEL_BUILDUP = 0.005;  // perso qui monte (anticipation)
-const VEL_LANDING = 0.0015; // SLOW-MO sur la chute de la cap (LA finalite)
-const VEL_INK     = 0.010;  // ink-blast un peu plus tendu apres la punchline
+const MAX_VELOCITY_PER_FRAME = 0.008; // ~2.1s pour parcourir 0 -> 1 a 60fps
 
 /**
  * Position de la casquette quand elle est posée (en %).
@@ -312,24 +297,6 @@ function recomputeTarget() {
     : 0;
 }
 
-// Renvoie la velocite max autorisee selon la phase d'animation actuelle.
-// L'objectif : forcer le user a voir la phase "cap descend sur le crane"
-// meme s'il scrolle d'un coup en bas. Cette phase critique tourne au
-// ralenti, peu importe la vitesse de scroll de l'utilisateur.
-function currentMaxVelocity() {
-  const progressInHero = displayedProgressFull / ANIM_END_FRAC;
-  if (progressInHero >= P_GUY_DONE && progressInHero < P_LANDING_END) {
-    return VEL_LANDING;   // SLOW : la cap tombe sur le crane
-  }
-  if (progressInHero >= P_GUY_IN && progressInHero < P_GUY_DONE) {
-    return VEL_BUILDUP;   // anticipation : le perso monte
-  }
-  if (progressInHero >= 1) {
-    return VEL_INK;       // zone ink-blast (apres l'animation)
-  }
-  return VEL_NORMAL;
-}
-
 function tickFrame() {
   rafId = null;
   recomputeTarget();
@@ -337,8 +304,7 @@ function tickFrame() {
   const diff = targetProgressFull - displayedProgressFull;
   const absDiff = Math.abs(diff);
   if (absDiff > 0.0005) {
-    const maxVel = currentMaxVelocity();
-    const step = Math.sign(diff) * Math.min(absDiff, maxVel);
+    const step = Math.sign(diff) * Math.min(absDiff, MAX_VELOCITY_PER_FRAME);
     displayedProgressFull = clamp(displayedProgressFull + step, 0, 1);
   } else {
     displayedProgressFull = targetProgressFull;
