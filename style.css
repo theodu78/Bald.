@@ -161,14 +161,17 @@ html, body {
 .cap {
   position: absolute;
   left: 50%;
-  top: 12%;
+  top: 0;
   width: clamp(120px, 11vw, 200px);
   aspect-ratio: 1774 / 1246;
-  transform: translateX(-50%) rotate(0deg);
+  /* Position initiale via transform (12vh = ancien top: 12%).
+     L'anim JS modifie translateY en px a chaque frame — pas de reflow. */
+  transform: translate3d(-50%, 12vh, 0) rotate(0deg);
   transform-origin: 50% 50%;
   z-index: 10;
-  will-change: transform, top;
+  will-change: transform;
   transition: opacity 0.18s ease;
+  backface-visibility: hidden;
 }
 .cap.hidden { opacity: 0; }
 .cap img {
@@ -187,12 +190,15 @@ html, body {
 .bald-guy {
   position: absolute;
   left: 50%;
-  top: 100%;
+  top: 0;
   width: clamp(200px, 18vw, 340px);
   aspect-ratio: 1368 / 1691;
-  transform: translateX(-44%);
+  /* Position initiale via transform (100vh = ancien top: 100%, hors viewport).
+     translateX(-44%) = compensation crane decentre, voir commentaire au-dessus. */
+  transform: translate3d(-44%, 100vh, 0);
   z-index: 5;
-  will-change: top;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .bald-guy img {
   position: absolute;

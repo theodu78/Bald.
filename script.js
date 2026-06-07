@@ -230,9 +230,14 @@ function updateAnimation() {
     guyTopPct = guyTopFinalPct;
   }
 
-  cap.style.top       = capTopPct + '%';
-  cap.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-  baldGuy.style.top   = guyTopPct + '%';
+  // Anim 100% GPU : on n'utilise plus `top:%` (qui force un layout reflow a
+  // chaque frame), uniquement transform avec translate3d (composite-only).
+  // Conversion % viewport -> pixels.
+  const vh = window.innerHeight;
+  const capYpx = (capTopPct / 100) * vh;
+  const guyYpx = (guyTopPct / 100) * vh;
+  cap.style.transform     = `translate3d(-50%, ${capYpx}px, 0) rotate(${rotation}deg)`;
+  baldGuy.style.transform = `translate3d(-44%, ${guyYpx}px, 0)`;
 
   // ============ IMPACT ============
   if (progress >= P_LANDING_END && progress < P_IMPACT_END) {
