@@ -113,15 +113,10 @@ html, body {
 }
 
 /* ============ STAGE ============ */
-/* z-index 4 : au-dessus de .premium-world (z-index 3) pour que le contenu
-   du dessous (Yes We Bald) ne remonte PAS au-dessus de la stage quand le
-   user scrolle vite. La stage fade en opacity:0 (.hero-fade) au moment
-   ou l'ink-blast prend le relai — l'ink-blast (z-index 40) couvre alors
-   tout l'ecran avant de reveler le premium-world. */
 .stage {
   position: fixed;
   inset: 0;
-  z-index: 4;
+  z-index: 1;
   overflow: hidden;
 }
 .sky {
